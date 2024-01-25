@@ -18,7 +18,7 @@ fn main() {
 
     let output = format!(
         r#"pub const CURRENT_COMMIT_ID : &'static str = "{}"; "#,
-        commit
+        commit.trim()
     );
 
     f.write_all(output.as_bytes()).unwrap();
