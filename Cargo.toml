@@ -1,0 +1,18 @@
+[package]
+name = "rustdemo"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serialport = "4.2.2"
+hidapi = "2.4.1"
+lazy_static = "1.4.0"
+url = "1.0"
+thiserror = "*"
+anyhow = "*"
+dashmap = "*"
+tokio = "*"
+tracing = "*"
