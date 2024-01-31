@@ -1,7 +1,9 @@
 use anyhow::anyhow;
-use std::io;
+use log::*;
+use std::{error::Error, io};
+use thiserror::Error;
 
-use hidapi::{DeviceInfo, HidApi};
+use hidapi::{DeviceInfo, HidApi, HidDevice};
 
 enum VupCmd {
     GetVersion,
@@ -86,6 +88,7 @@ struct HidTransport {
     pid: u16,
     vid: u16,
 
+    dev: Option<HidDevice>,
     connected: bool,
 }
 
@@ -103,6 +106,21 @@ impl Transport for HidTransport {
     }
 
     fn connect(&self) -> io::Result<()> {
+        // let api = HidApi::new().unwrap();
+        // // get first
+        // let di = api
+        //     .device_list()
+        //     .take_while(|&x| x.product_id() == VANCH_PID || x.vendor_id() == VANCH_VID)
+        //     .next()
+        //     .expect(
+        //         format!(
+        //             "No device found with VID: 0x{:04X} PID: 0x{:04X}",
+        //             VANCH_VID, VANCH_PID
+        //         )
+        //         .as_str(),
+        //     );
+
+        // let dev = di.open_device(&api)?;
         todo!()
     }
 }
@@ -113,20 +131,8 @@ impl HidTransport {
             pid,
             vid,
             connected: false,
+            dev: None,
         }
-    }
-
-    fn find_device(&self) -> Result<DeviceInfo, anyhow::Error> {
-        let api = HidApi::new()?;
-        for device in api.device_list() {
-            println!("0x{:04X}:0x{:04X}", device.vendor_id(), device.product_id());
-
-            if device.vendor_id() == self.vid && device.product_id() == self.pid {
-                return Ok(device.clone());
-            }
-        }
-
-        Err(anyhow!("device not found"))
     }
 }
 
@@ -136,16 +142,45 @@ const VANCH_PID: u16 = 0x5750;
 fn main() {
     println!("Printing all available hid devices:");
 
-    let api = HidApi::new().unwrap();
-    // get first
-    let di = api
-        .device_list()
-        .take_while(|&x| x.product_id() == VANCH_PID || x.vendor_id() == VANCH_VID)
-        .next()
-        .expect("no device found");
+    // let api = HidApi::new().unwrap();
+    // // get first
+    // let di = api
+    //     .device_list()
+    //     .take_while(|&x| x.product_id() == VANCH_PID || x.vendor_id() == VANCH_VID)
+    //     .next()
+    //     .expect(
+    //         format!(
+    //             "No device found with VID: 0x{:04X} PID: 0x{:04X}",
+    //             VANCH_VID, VANCH_PID
+    //         )
+    //         .as_str(),
+    //     );
 
-    let dev = di.open_device(&api).unwrap();
+    // let dev = di.open_device(&api).unwrap();
 
-    // get version command
-    let _ = dev.write(vec![1, 2, 3, 4].as_ref());
+    // // get version command
+    // let _ = dev.write(vec![1, 2, 3, 4].as_ref());
+
+    let le: LibErr = LibErr::E2;
+
+    println!("{:?}", le);
+    info!("trace log {:?}", le);
+
+    let vup_err: &dyn std::error::Error = &VupErr::LibErr(LibErr::E2);
+
+    println!("{:?}", vup_err);
+    // error!("error log: {}", vup_err);
+}
+
+#[derive(Debug)]
+enum LibErr {
+    UsbDeviceNotFound = 0x98,
+    E2 = 0x88,
+}
+
+#[derive(Debug, Error)]
+enum VupErr {
+    // lib error with code
+    #[error("error from lib: {0:?}")]
+    LibErr(LibErr),
 }
