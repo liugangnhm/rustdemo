@@ -8,7 +8,7 @@ build = "build.rs"
 
 [dependencies]
 serialport = "4.2.2"
-hidapi = "2.4.1"
+hidapi = "2.5.1"
 lazy_static = "1.4.0"
 url = "1.0"
 thiserror = "*"
