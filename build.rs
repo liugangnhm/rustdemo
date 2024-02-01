@@ -22,4 +22,30 @@ fn main() {
     );
 
     f.write_all(output.as_bytes()).unwrap();
+
+    let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+
+    println!("generating c bindings header file......");
+    cbindgen::Builder::new()
+        .with_crate(crate_dir)
+        // .with_config(Config::from_file("lib.toml").unwrap())
+        // .exclude_item("Box")
+        .with_language(cbindgen::Language::C)
+        .with_cpp_compat(true)
+        .generate()
+        .expect("Unable to generate c bindings")
+        .write_to_file("bindings.h");
+
+    let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+
+    // generate cpython bindings
+    cbindgen::Builder::new()
+        .with_crate(crate_dir)
+        // .with_config(Config::from_file("lib.toml").unwrap())
+        // .exclude_item("Box")
+        .with_language(cbindgen::Language::Cython)
+        .with_cpp_compat(true)
+        .generate()
+        .expect("Unable to generate cython bindings")
+        .write_to_file("bindings.pyx");
 }
