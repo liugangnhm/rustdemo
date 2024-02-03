@@ -1,1 +1,4 @@
 /target
+a.out
+a.out.dSYM
+.DS_Store

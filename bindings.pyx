@@ -14,6 +14,10 @@ cdef extern from *:
   # @param with_box The box to be dropped.
   void root(const MyStruct *with_box);
 
+  MyStruct *create_my_struct_box();
+
+  void create_my_struct_ref();
+
   # This function takes a box and drops it.
   void drop_box(int32_t *x);
 
@@ -21,3 +25,11 @@ cdef extern from *:
 
   # This function takes an optional box and drops it if it is not None.
   void drop_box_opt(int32_t *x);
+
+  uint16_t *ffi_test();
+
+  void create_my_struct_array(MyStruct **prt, int32_t *len);
+
+  void drop_my_struct_array(MyStruct *prt);
+
+  void ffi_test_2(uint16_t *p);
