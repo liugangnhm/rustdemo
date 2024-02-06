@@ -33,7 +33,7 @@ int main()
     printf("Number from rust: %d\n", *(ptr + i)->number);
   }
 
-  drop_my_struct_array(ptr);
+  drop_my_struct_array(ptr, len);
 
   return 0;
 }

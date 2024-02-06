@@ -1,3 +1,5 @@
+use std::ops::{Deref, DerefMut};
+
 pub fn hello_world() {
     println!("Hello, world!");
 }
@@ -17,7 +19,7 @@ pub struct MyStruct {
 
 impl Drop for MyStruct {
     fn drop(&mut self) {
-        println!("Dropping MyStruct");
+        println!("Dropping MyStruct {}", self.number);
     }
 }
 
@@ -75,6 +77,11 @@ pub extern "C" fn create_my_struct_array(prt: *mut *mut MyStruct, len: *mut i32)
         },
     ]);
 
+    // print address of each element
+    for i in 0..4 {
+        println!("MyStruct address: {} {:p}", i, &test[i]);
+    }
+
     unsafe {
         *prt = Box::into_raw(test) as *mut _;
         *len = 4i32;
@@ -82,10 +89,26 @@ pub extern "C" fn create_my_struct_array(prt: *mut *mut MyStruct, len: *mut i32)
 }
 
 #[no_mangle]
-pub extern "C" fn drop_my_struct_array(prt: *mut MyStruct) {
-    unsafe {
-        let test = Box::from_raw(prt);
-    }
+pub extern "C" fn drop_my_struct_array(prt: *mut MyStruct, len: usize) {
+    // unsafe {
+    // method 1:
+    // let test = Box::from_raw(prt as *mut [MyStruct; 4]);
+    // }
+
+    // method 2:
+    // let slice: &mut [MyStruct] = unsafe { std::slice::from_raw_parts_mut(prt, len) };
+    // for i in 0..len {
+    //     //drop(slice[i].number);
+    //     println!("MyStruct: {}", slice[i].number);
+    // }
+
+    // method 3:
+    // unsafe {
+    //     std::ptr::drop_in_place(prt);
+    // }
+
+    // method 4: right way to drop a slice of boxes
+    unsafe { std::ptr::drop_in_place(std::slice::from_raw_parts_mut(prt, len)) };
 }
 
 #[no_mangle]

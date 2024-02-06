@@ -38,7 +38,7 @@ uint16_t *ffi_test(void);
 
 void create_my_struct_array(struct MyStruct **prt, int32_t *len);
 
-void drop_my_struct_array(struct MyStruct *prt);
+void drop_my_struct_array(struct MyStruct *prt, uintptr_t len);
 
 void ffi_test_2(uint16_t *p);
 
